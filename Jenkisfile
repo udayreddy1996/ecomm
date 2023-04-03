@@ -1,0 +1,34 @@
+pipeline {
+    agent {label "Docker2023"}
+    environment {
+    DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+    stages {
+        stage('SCM Checkout') {
+            steps {
+                sh 'rm -rf *'
+                sh 'git clone https://github.com/udayreddy1996/ecomm.git'
+            }
+        }
+        stage('build docker image') {
+            steps {
+                sh 'pwd'
+                sh 'cd ecomm'
+                sh 'sudo mv ecomm/Dockerfile  . '
+                sh 'sudo docker build -t uday011/ecomm:$BUILD_NUMBER . '
+            }
+        }
+        stage('docker images list') {
+            steps {
+                sh 'sudo docker images'
+            }
+        }
+        stage('push image to dockerhub'){
+            steps{
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'sudo docker push uday011/ecomm:$BUILD_NUMBER'
+                sh 'sudo docker logout'
+            }
+        }
+    }
+}
