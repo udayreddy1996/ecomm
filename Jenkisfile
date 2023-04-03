@@ -30,5 +30,14 @@ pipeline {
                 sh 'sudo docker logout'
             }
         }
+        stage('push to k8s') {
+            agent {label "KS"}
+            steps{
+                sh 'pwd'
+                sh 'cp /home/ec2-user/ds.yaml .'
+                sh 'ls'
+                sh 'kubectl apply -f ds.yaml'
+            }
+        }
     }
 }
